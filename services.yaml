@@ -1,0 +1,19 @@
+services:
+  - name: abc
+    kubernetesServiceName: ucbpg
+    successMessage: Successfully
+    failureMessage: failed
+    notificationInterval: 3
+
+#  - name: breb-postpaid
+#    endpoint: https://billpay.rebpbs.com/breb_cbdg_data_servx.asmx
+#    method: GET
+#    maxErrorCount: 3
+#    checkInterval: 4
+#    consecutiveNotificationDelay: 100
+#    timeout: 30
+
+slackUrl: https://hooks.slack.com/services/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
+elasticSearchUrl: http://172.17.17.44:9200
+redisHost: 127.0.0.1
+redisPost: 6379
