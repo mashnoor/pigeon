@@ -1,0 +1,13 @@
+services:
+  - name: ucbpg
+    kubernetesServiceName: ucbpg
+    successMessage: Money has been successfully added
+    failureMessage: failed
+    notificationInterval: 86400
+
+
+
+slackUrl:
+elasticSearchUrl: http://172.17.17.44:9200
+redisHost: 127.0.0.1
+redisPost: 6379
