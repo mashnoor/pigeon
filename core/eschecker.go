@@ -16,7 +16,6 @@ import (
 func execute(service *structures.Service, wg *sync.WaitGroup) {
 	for true {
 		generateSummary(service)
-		fmt.Println("Waiting....")
 		time.Sleep(time.Second * service.NotificationInterval)
 
 	}
@@ -29,7 +28,7 @@ func generateSummary(service *structures.Service) {
 	currentTimeUTC := currentTime.UTC()
 
 	currentTimeStr := currentTime.Format("2006-01-02 15:04:05")
-	checkPointTimeStr := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
+	checkPointTimeStr := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02 15:04:05")
 
 	checkpointTimeUTCStr := currentTimeUTC.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
 
