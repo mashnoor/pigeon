@@ -5,24 +5,25 @@ import (
 	"sync"
 )
 
-func initNotificationSystem() {
+func initSummarySystem() {
 	var wg sync.WaitGroup
 
 	for _, service := range settings.SystemAppConfig.Services {
 		currentService := service
+		generateSummary(&currentService, &wg)
 		//fmt.Println(service.Endpoint)
-		go checkHTTPHealth(&currentService, &wg)
-		wg.Add(1)
+		//go checkHTTPHealth(&currentService, &wg)
+		//wg.Add(1)
 
 	}
 
-	wg.Wait()
+	//wg.Wait()
 }
 
 func BootApp() {
 	settings.LoadAppConfig()
 	settings.LoadESClient()
 	settings.InitRedis()
-	//initNotificationSystem()
+	initSummarySystem()
 
 }

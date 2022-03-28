@@ -5,11 +5,35 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/mashnoor/pigeon/helpers"
 	"github.com/mashnoor/pigeon/settings"
+	"github.com/mashnoor/pigeon/structures"
 	"log"
+	"sync"
+	"time"
 )
 
-func getTotalHits(label, logMsg string) {
+func generateSummary(service *structures.Service, wg *sync.WaitGroup) {
+	currentTime := time.Now()
+	currentTimeStr := currentTime.Format("2006-01-02T15:04:05.000Z")
+	checkpointTime := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
+
+	//checkPointTime := "2022-03-27T00:55:47.165Z"
+	totalSuccessHits := getTotalHits(service.KubernetesServiceName, service.SuccessMessage, checkpointTime)
+	totalFailureHits := getTotalHits(service.KubernetesServiceName, service.FailureMessage, checkpointTime)
+
+	totalRecords := totalSuccessHits + totalFailureHits
+	successP := (float64(totalSuccessHits) / float64(totalRecords)) * 100
+	successPercentage := fmt.Sprintf("%.2f", successP)
+	failurePercentage := fmt.Sprintf("%.2f", 100-successP)
+
+	slackMsg := fmt.Sprintf("*%s Summary* :bird:\n*Time Range:* %s-%s\n*Total Success Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, currentTimeStr, checkpointTime, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+	helpers.SendSlackMessage(slackMsg)
+	fmt.Println(totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+
+}
+
+func getTotalHits(label, logMsg, checkPointTime string) int {
 	var buf bytes.Buffer
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
@@ -30,8 +54,7 @@ func getTotalHits(label, logMsg string) {
 				"filter": map[string]interface{}{
 					"range": map[string]interface{}{
 						"@timestamp": map[string]string{
-							"gte": "2022-03-27T00:55:47.165Z",
-							"lte": "2022-03-27T00:55:47.165Z",
+							"gte": checkPointTime,
 						},
 					},
 				},
@@ -81,4 +104,6 @@ func getTotalHits(label, logMsg string) {
 		int(r["hits"].(map[string]interface{})["total"].(map[string]interface{})["value"].(float64)),
 		int(r["took"].(float64)),
 	)
+
+	return int(r["hits"].(map[string]interface{})["total"].(map[string]interface{})["value"].(float64))
 }
