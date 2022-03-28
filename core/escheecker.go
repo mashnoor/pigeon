@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mashnoor/pigeon/helpers"
 	"github.com/mashnoor/pigeon/settings"
 	"github.com/mashnoor/pigeon/structures"
 	"log"
@@ -13,7 +12,17 @@ import (
 	"time"
 )
 
-func generateSummary(service *structures.Service, wg *sync.WaitGroup) {
+func execute(service *structures.Service, wg *sync.WaitGroup) {
+	for true {
+		generateSummary(service)
+		fmt.Println("Waiting....")
+		time.Sleep(time.Second * service.NotificationInterval)
+
+	}
+	wg.Done()
+}
+
+func generateSummary(service *structures.Service) {
 	currentTime := time.Now()
 	currentTimeStr := currentTime.Format("2006-01-02T15:04:05.000Z")
 	checkpointTime := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
@@ -27,9 +36,10 @@ func generateSummary(service *structures.Service, wg *sync.WaitGroup) {
 	successPercentage := fmt.Sprintf("%.2f", successP)
 	failurePercentage := fmt.Sprintf("%.2f", 100-successP)
 
-	slackMsg := fmt.Sprintf("*%s Summary* :bird:\n*Time Range:* %s-%s\n*Total Success Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, currentTimeStr, checkpointTime, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
-	helpers.SendSlackMessage(slackMsg)
-	fmt.Println(totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+	slackMsg := fmt.Sprintf("*:bird: Pigeon Got Your Summary*\n*Service Name:* %s\n*Time Range:* %s to %s\n*Total Success Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, checkpointTime, currentTimeStr, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+	//helpers.SendSlackMessage(slackMsg)
+	fmt.Println(slackMsg)
+	//fmt.Println(totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
 
 }
 

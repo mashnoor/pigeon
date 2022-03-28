@@ -10,20 +10,20 @@ func initSummarySystem() {
 
 	for _, service := range settings.SystemAppConfig.Services {
 		currentService := service
-		generateSummary(&currentService, &wg)
+		//generateSummary(&currentService)
 		//fmt.Println(service.Endpoint)
-		//go checkHTTPHealth(&currentService, &wg)
-		//wg.Add(1)
+		go execute(&currentService, &wg)
+		wg.Add(1)
 
 	}
 
-	//wg.Wait()
+	wg.Wait()
 }
 
 func BootApp() {
 	settings.LoadAppConfig()
 	settings.LoadESClient()
-	settings.InitRedis()
+	//settings.InitRedis()
 	initSummarySystem()
 
 }
