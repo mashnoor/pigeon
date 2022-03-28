@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/mashnoor/pigeon/helpers"
 	"github.com/mashnoor/pigeon/settings"
 	"github.com/mashnoor/pigeon/structures"
 	"log"
@@ -23,21 +24,25 @@ func execute(service *structures.Service, wg *sync.WaitGroup) {
 }
 
 func generateSummary(service *structures.Service) {
-	currentTime := time.Now()
-	currentTimeStr := currentTime.Format("2006-01-02T15:04:05.000Z")
-	checkpointTime := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
 
-	//checkPointTime := "2022-03-27T00:55:47.165Z"
-	totalSuccessHits := getTotalHits(service.KubernetesServiceName, service.SuccessMessage, checkpointTime)
-	totalFailureHits := getTotalHits(service.KubernetesServiceName, service.FailureMessage, checkpointTime)
+	currentTime := time.Now()
+	currentTimeUTC := currentTime.UTC()
+
+	currentTimeStr := currentTime.Format("2006-01-02 15:04:05")
+	checkPointTimeStr := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
+
+	checkpointTimeUTCStr := currentTimeUTC.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
+
+	totalSuccessHits := getTotalHits(service.KubernetesServiceName, service.SuccessMessage, checkpointTimeUTCStr)
+	totalFailureHits := getTotalHits(service.KubernetesServiceName, service.FailureMessage, checkpointTimeUTCStr)
 
 	totalRecords := totalSuccessHits + totalFailureHits
 	successP := (float64(totalSuccessHits) / float64(totalRecords)) * 100
 	successPercentage := fmt.Sprintf("%.2f", successP)
 	failurePercentage := fmt.Sprintf("%.2f", 100-successP)
 
-	slackMsg := fmt.Sprintf("*:bird: Pigeon Got Your Summary*\n*Service Name:* %s\n*Time Range:* %s to %s\n*Total Success Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, checkpointTime, currentTimeStr, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
-	//helpers.SendSlackMessage(slackMsg)
+	slackMsg := fmt.Sprintf("*:bird: Pigeon Got Your Summary*\n*Service Name:* %s\n*Time Range:* %s to %s\n*Total Successful Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, checkPointTimeStr, currentTimeStr, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+	helpers.SendSlackMessage(slackMsg)
 	fmt.Println(slackMsg)
 	//fmt.Println(totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
 
