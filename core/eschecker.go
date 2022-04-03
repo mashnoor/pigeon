@@ -27,8 +27,10 @@ func generateSummary(service *structures.Service) {
 	currentTime := time.Now()
 	currentTimeUTC := currentTime.UTC()
 
-	currentTimeStr := currentTime.Format("2006-01-02 15:04:05")
-	checkPointTimeStr := currentTime.Add(-time.Second * service.NotificationInterval).Format("2006-01-02 15:04:05")
+	//currentTimeStr := currentTime.Format("2006-01-02 15:04:05")
+	currentTimeStr := currentTime.Format("15:04:05")
+
+	checkPointTimeStr := currentTime.Add(-time.Second * service.NotificationInterval).Format("15:04:05")
 
 	checkpointTimeUTCStr := currentTimeUTC.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
 
