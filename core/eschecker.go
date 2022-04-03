@@ -33,14 +33,15 @@ func generateSummary(service *structures.Service) {
 	checkpointTimeUTCStr := currentTimeUTC.Add(-time.Second * service.NotificationInterval).Format("2006-01-02T15:04:05.000Z")
 
 	totalSuccessHits := getTotalHits(service.KubernetesServiceName, service.SuccessMessage, checkpointTimeUTCStr)
-	totalFailureHits := getTotalHits(service.KubernetesServiceName, service.FailureMessage, checkpointTimeUTCStr)
+	//totalFailureHits := getTotalHits(service.KubernetesServiceName, service.FailureMessage, checkpointTimeUTCStr)
 
-	totalRecords := totalSuccessHits + totalFailureHits
-	successP := (float64(totalSuccessHits) / float64(totalRecords)) * 100
-	successPercentage := fmt.Sprintf("%.2f", successP)
-	failurePercentage := fmt.Sprintf("%.2f", 100-successP)
+	//totalRecords := totalSuccessHits + totalFailureHits
+	//successP := (float64(totalSuccessHits) / float64(totalRecords)) * 100
+	//successPercentage := fmt.Sprintf("%.2f", successP)
+	//failurePercentage := fmt.Sprintf("%.2f", 100-successP)
 
-	slackMsg := fmt.Sprintf("*:bird: Pigeon Got Your Summary*\n*Service Name:* %s\n*Time Range:* %s to %s\n*Total Successful Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, checkPointTimeStr, currentTimeStr, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+	//slackMsg := fmt.Sprintf("*:bird: Pigeon Got Your Summary*\n*Service Name:* %s\n*Time Range:* %s to %s\n*Total Successful Transactions:* %d\n*Total Failed Transactions:* %d\n*Percentage:* Success: %s Failure: %s\n", service.Name, checkPointTimeStr, currentTimeStr, totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
+	slackMsg := fmt.Sprintf("*:bird: Pigeon Got Your Summary*\n*Service Name:* %s\n*Time Range:* %s to %s\n*Total Successful Transactions:* %d", service.Name, checkPointTimeStr, currentTimeStr, totalSuccessHits)
 	helpers.SendSlackMessage(slackMsg)
 	fmt.Println(slackMsg)
 	//fmt.Println(totalSuccessHits, totalFailureHits, successPercentage, failurePercentage)
