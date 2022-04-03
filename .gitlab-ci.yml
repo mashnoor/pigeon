@@ -1,0 +1,21 @@
+stages:
+  - build
+
+build-container:
+  tags:
+    - docker-shell
+  environment:
+    name: build-and-push-container
+  stage: build
+
+  before_script:
+    - docker info
+    - id
+
+  script:
+    - mkdir -p /home/gitlab-runner/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"}}}" > /home/gitlab-runner/.docker/config.json
+    - docker build . -f Dockerfile -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  only:
+    - tags
